@@ -16,7 +16,7 @@ program main
         result = w
         call ww(x, y, x0, y0, w)
         call intp2tgl(dx, dy, x, y, x0, y0,w, dw)
-        result = (w - result) / dw
+        result = abs((w - result) / dw)
         write(*, '(A, E8.2, A, F18.15)') 'dx = dy = ', dxx, '   Ratio = ', result
       end do
   
