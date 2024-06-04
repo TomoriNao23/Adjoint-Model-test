@@ -1,34 +1,61 @@
 module my_module
   implicit none
 contains
+  ! 设置测试点和参考点
+    subroutine initialize_values(x0, y0, x, y, dx, dy, dxx, dyy, w, dw, i)
+      implicit none
+      integer, intent(in) :: i
+      real*8, intent(out) :: x0, y0, x, y, dx, dy, dxx, dyy, w, dw
+
+      x0 = 0
+      y0 = 0
+      x = 2
+      y = 2
+      dx = 10**(-1 * real(i, kind=8))
+      dy = dx
+      dxx = dx
+      dyy = dx
+      w = 0
+      dw = 0
+      return
+    end
+
+  ! 计算ww
+    subroutine ww(x, y, x0, y0, w)
+      implicit none
+      real*8  x, y, x0, y0                                                                                  
+      real*8 w  
+
+      w = (x - x0)**2 + (y - y0)**2
+      w = exp(-w)
+      return
+    end
 
   ! Tangent Linear Model
-  function qiexianxin(dx, dy, x, y, x0, y0) result(dw2)
-    implicit none
-    real :: dx, dy, x, y, x0, y0
-    real :: w1, dw1, w2, dw2
-    
-    w1 = (x - x0)**2 + (y - y0)**2
-    dw1 = 2.0 * (x - x0) * dx + 2.0 * (y - y0) * dy
-    
-    w2 = exp(-w1)
-    dw2 = exp(-w1) * dw1
-  end function qiexianxin
+    subroutine intp2tgl(dx, dy, x, y, x0, y0,w, dw)
+      implicit none
+      real*8 dx, dy, x, y, x0, y0                                                  
+      real*8 dw                                  
+      real*8 w                              
+
+      !w = (x - x0)**2 + (y - y0)**2
+      dw = 2 * (x - x0) * dx + 2 * (y - y0) * dy
+      !w = exp(-w)
+      dw = -w * dw
+      return
+    end
 
   ! Adjoint Model
-  subroutine bansui(dw2, x, y, x0, y0, dx, dy)
-    implicit none
-    real :: dw2, x, y, x0, y0
-    real :: w1, w2, dw1
-    real :: dx, dy
-    
-    w1 = (x - x0)**2 + (y - y0)**2
-    w2 = exp(-w1)
-    
-    dw1 = exp(-w1) * dw2
-    
-    dx = 2.0 * (x - x0) * dw1
-    dy = 2.0 * (y - y0) * dw1
-  end subroutine bansui
+    subroutine intp2adj(dx, dy, x, y, x0, y0, w, dw)
+      implicit none
+      real*8 dx, dy, x, y, x0, y0                                                  
+      real*8 dw, dww                                  
+      real*8 w   
+
+      dww = w * dw 
+      dx = 2 * (x - x0) * dww
+      dy = 2 * (y - y0) * dww
+      return
+    end
 
 end module my_module

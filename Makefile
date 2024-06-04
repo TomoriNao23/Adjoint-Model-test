@@ -24,7 +24,7 @@ $(MAIN): main_program.f90
 
 # 运行程序并将输出重定向到 output.txt
 run: $(TARGET)
-	@./$(TARGET) > ./output.txt 
+	./$(TARGET) > ./output.txt 
 	@cat output.txt
 
 # 清理生成的文件
