@@ -28,4 +28,4 @@ program main
     call intp2adj(dxx, dyy, x, y, x0, y0,w, dw)
     write(*, '(A, E21.15)') 'dxx*dx+dyy*dy = ', abs(dxx * dx + dyy * dy)
 
-  end program main
+end program main
