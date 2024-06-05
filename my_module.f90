@@ -71,7 +71,7 @@ contains
   ! Run all the subroutines
   subroutine run_all(this,i)
     class(Point), intent(inout) :: this
-    integer, optional, intent(in) :: i
+    integer, intent(in) :: i
     call this%initialize_values(i)
     call this%ww()
     call this%ww_plus()
