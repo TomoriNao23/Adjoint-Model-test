@@ -6,7 +6,7 @@ program main
   integer :: i
 
   ! Test for Tangent Linear Model
-  write(*, '(/A)') 'Test for Tangent Linear Model'
+  write(*, '(A)') 'Test for Tangent Linear Model'
   do i = 1, 10
     call p(i)%run_all(i+1)
     write(*, '(A, E8.2, A, F18.15)') 'dx = dy = ', p(i)%dxx, '   Ratio = ', (p(i)%wplus - p(i)%w) / p(i)%dw
