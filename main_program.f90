@@ -1,7 +1,6 @@
 program main
   use my_module
   implicit none
-
   type(Point) :: p(10)
   integer :: i
 
