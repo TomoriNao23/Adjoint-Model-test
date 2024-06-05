@@ -1,61 +1,68 @@
 module my_module
   implicit none
+
+  ! Define the derived type
+  type :: Point
+    real*8 :: x0, y0, x, y, dx, dy, dxx, dyy, w, dw, wplus
+  contains
+    procedure :: initialize => initialize_values
+    procedure :: compute_ww => ww
+    procedure :: compute_wwplus => ww_plus
+    procedure :: tangent_linear_model => intp2tgl
+    procedure :: adjoint_model => intp2adj
+  end type Point
+
 contains
-  ! 设置测试点和参考点
-    subroutine initialize_values(x0, y0, x, y, dx, dy, dxx, dyy, w, dw, i)
-      implicit none
-      integer, intent(in) :: i
-      real*8, intent(out) :: x0, y0, x, y, dx, dy, dxx, dyy, w, dw
+  ! Set test points and reference points
+  subroutine initialize_values(this, i)
+    class(Point), intent(inout) :: this
+    integer, optional, intent(in) :: i
 
-      x0 = 0
-      y0 = 0
-      x = 2
-      y = 2
-      dx = 10**(-1 * real(i, kind=8))
-      dy = dx
-      dxx = dx
-      dyy = dx
-      w = 0
-      dw = 0
-      return
-    end
+    this%x0 = 0
+    this%y0 = 0
+    this%x = 2
+    this%y = 2
+    this%w = 0
+    this%wplus = 0
+    this%dw = 0
+    this%dx = 10**(-1 * real(i, kind=8))
+    this%dy = this%dx
+    this%dxx = this%dx
+    this%dyy = this%dx
+  end subroutine initialize_values
 
-  ! 计算ww
-    subroutine ww(x, y, x0, y0, w)
-      implicit none
-      real*8  x, y, x0, y0                                                                                  
-      real*8 w  
+  ! Compute ww
+  subroutine ww(this)
+    class(Point), intent(inout) :: this
 
-      w = (x - x0)**2 + (y - y0)**2
-      w = exp(-w)
-      return
-    end
+    this%w = (this%x - this%x0)**2 + (this%y - this%y0)**2
+    this%w = exp(-this%w)
+  end subroutine ww
+
+  ! Compute ww_plus
+  subroutine ww_plus(this)
+    class(Point), intent(inout) :: this
+
+    this%wplus = (this%x + this%dx - this%x0)**2 + (this%y + this%dy- this%y0)**2
+    this%wplus = exp(-this%wplus)
+  end subroutine ww_plus
 
   ! Tangent Linear Model
-    subroutine intp2tgl(dx, dy, x, y, x0, y0,w, dw)
-      implicit none
-      real*8 dx, dy, x, y, x0, y0                                                  
-      real*8 dw                                  
-      real*8 w                              
+  subroutine intp2tgl(this)
+    class(Point), intent(inout) :: this
 
-      !w = (x - x0)**2 + (y - y0)**2
-      dw = 2 * (x - x0) * dx + 2 * (y - y0) * dy
-      !w = exp(-w)
-      dw = -w * dw
-      return
-    end
+    this%dw = 2 * (this%x - this%x0) * this%dx + 2 * (this%y - this%y0) * this%dy
+    this%dw = -this%w * this%dw
+  end subroutine intp2tgl
 
   ! Adjoint Model
-    subroutine intp2adj(dx, dy, x, y, x0, y0, w, dw)
-      implicit none
-      real*8 dx, dy, x, y, x0, y0                                                  
-      real*8 dw, dww                                  
-      real*8 w   
+  subroutine intp2adj(this)
+    class(Point), intent(inout) :: this
+    real*8 :: dww
 
-      dww = w * dw 
-      dx = 2 * (x - x0) * dww
-      dy = 2 * (y - y0) * dww
-      return
-    end
+    dww = this%w * this%dw
+    this%dx = 2 * (this%x - this%x0) * dww
+    this%dy = 2 * (this%y - this%y0) * dww
+  end subroutine intp2adj
 
 end module my_module

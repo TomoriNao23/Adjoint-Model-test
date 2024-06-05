@@ -1,31 +1,28 @@
 program main
   use my_module
   implicit none
-  real*8 dx, dy, x, y, x0, y0                                                  
-  real*8 dw, w                                  
-  real*8 dxx, dyy, result
-  integer i
+
+  type(Point) :: p(9)
+  integer :: i
+
+  ! Test for Tangent Linear Model
+  print *, 'Test for Tangent Linear Model'
+  do i = 2, 10
+    call p(i-1)%initialize(i)
+    call p(i-1)%compute_ww()
+    call p(i-1)%compute_wwplus()
+    call p(i-1)%tangent_linear_model()
+    write(*, '(A, E8.2, A, F18.15)') 'dx = dy = ', p(i-1)%dxx, '   Ratio = ', (p(i-1)%wplus - p(i-1)%w) / p(i-1)%dw
+  end do
   
-  !切线性检验
-    print *, 'Test for Tangent Linear Model'
-    do i = 2,10
-      ! 设置测试点和参考点
-        call initialize_values(x0, y0, x, y, dx, dy, dxx, dyy, w, dw, i)
-      ! 调用切线性子程序
-        call ww(x+dx, y+dy, x0, y0, w)
-        result = w
-        call ww(x, y, x0, y0, w)
-        call intp2tgl(dx, dy, x, y, x0, y0,w, dw)
-        result = abs((w - result) / dw)
-        write(*, '(A, E8.2, A, F18.15)') 'dx = dy = ', dxx, '   Ratio = ', result
-      end do
-  
-  !伴随检验
-    print *, ' '
-    print *, 'Test for Adjoint Model'
-    call intp2tgl(dx, dy, x, y, x0, y0,w, dw)
-    write(*, '(A, E21.15)') 'dw*dw         = ', dw * dw 
-    call intp2adj(dxx, dyy, x, y, x0, y0,w, dw)
-    write(*, '(A, E21.15)') 'dxx*dx+dyy*dy = ', abs(dxx * dx + dyy * dy)
+  ! Test for Adjoint Model
+  print *, ' '
+  print *, 'Test for Adjoint Model'
+  i = 9
+  call p(i-1)%tangent_linear_model()
+  print *,p(i-1)%dw
+  write(*, '(A, E21.15)') 'dw*dw         = ', p(i-1)%dw * p(i-1)%dw 
+  call p(i-1)%adjoint_model()
+  write(*, '(A, E21.15)') 'dxx*dx+dyy*dy = ', abs(p(i-1)%dxx * p(i-1)%dx + p(i-1)%dyy * p(i-1)%dy)
 
 end program main
